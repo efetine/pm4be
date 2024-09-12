@@ -2,27 +2,28 @@ import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { productsRepository } from './products.repository';
+import { IProduct } from './interfaces/products.interfaces';
 
 @Injectable()
 export class ProductsService {
   constructor(private readonly productsRepository: productsRepository) {}
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+  async create(body: CreateProductDto): Promise<IProduct> {
+    return await this.productsRepository.create(body);
   }
 
-  findAll() {
-    return this.productsRepository.findAll();
+  async findAll(): Promise<IProduct[]> {
+    return await this.productsRepository.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
+  async findOne(id: number): Promise<IProduct> {
+    return await this.productsRepository.findOne(id);
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: number, body: UpdateProductDto): Promise<IProduct> {
+    return await this.productsRepository.update(id, body);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async delete(id: number): Promise<boolean> {
+    return await this.productsRepository.delete(id);
   }
 }

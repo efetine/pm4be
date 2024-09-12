@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { IProduct } from './interfaces/products.interfaces';
+import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateProductDto } from './dto/create-product.dto';
 
 @Injectable()
 export class productsRepository {
@@ -96,7 +98,57 @@ export class productsRepository {
     },
   ];
 
-  findAll(): IProduct[] {
+  async findAll(): Promise<IProduct[]> {
     return this.products;
+  }
+
+  async create(body: CreateProductDto): Promise<IProduct> {
+    return {
+      id: 10,
+      name: 'Solar Power Bank',
+      description:
+        'A portable power bank with solar charging and dual USB outputs.',
+      price: 59.99,
+      stock: true,
+      imgUrl: 'https://example.com/images/solar-power-bank.jpg',
+    };
+  }
+
+  async findOne(id: number): Promise<IProduct> {
+    const product = this.products.find((product) => product.id === id);
+
+    if (!product)
+      throw new BadRequestException({
+        statusCode: 404,
+        message: 'bad request',
+      });
+
+    return product;
+  }
+
+  async delete(id: number): Promise<boolean> {
+    const index = this.products.findIndex((product) => product.id === id);
+    if (index === -1)
+      throw new BadRequestException({
+        statusCode: 404,
+        message: 'bad request',
+      });
+    this.products.splice(index, 1);
+    return true;
+  }
+
+  async update(id: number, body: UpdateProductDto): Promise<IProduct> {
+    const productIndex = this.products.findIndex(
+      (products) => products.id === id,
+    );
+    if (productIndex === -1)
+      throw new BadRequestException({
+        statusCode: 404,
+        message: 'bad request',
+      });
+    return (this.products[productIndex] = {
+      ...this.products[productIndex],
+      ...body,
+    });
   }
 }

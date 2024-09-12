@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { IUser } from './interfaces/user.interface';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UserOutput } from './interfaces/create-user-output';
 @Injectable()
 export class usersRepository {
-  private users = [
+  private users: IUser[] = [
     {
       id: 1,
       email: 'michael.scott@example.com',
@@ -45,7 +48,59 @@ export class usersRepository {
     },
   ];
 
-  findAll(): IUser[] {
-    return this.users;
+  async findAll(): Promise<UserOutput[]> {
+    const usersWithoutPasswords = this.users.map((user) => {
+      const { password, ...rest } = user;
+
+      return rest;
+    });
+
+    return usersWithoutPasswords;
+  }
+
+  async create(body: CreateUserDto): Promise<IUser> {
+    const newUserId = this.users.length + 1;
+    const newUser = { id: newUserId, ...body };
+    this.users.push(newUser);
+    return newUser;
+  }
+  async findOne(id: number): Promise<UserOutput> {
+    const user = this.users.find((user) => user.id === id);
+
+    if (user === undefined)
+      throw new BadRequestException({
+        statusCode: 404,
+        message: 'bad request',
+      });
+
+    const { password, ...rest } = user;
+
+    // delete user.password;
+
+    return rest;
+  }
+
+  async delete(id: number): Promise<boolean> {
+    const index = this.users.findIndex((user) => user.id === id);
+    if (index === -1)
+      throw new BadRequestException({
+        statusCode: 404,
+        message: 'bad request',
+      });
+    this.users.splice(index, 1);
+    return true;
+  }
+
+  async update(body: UpdateUserDto, id: number): Promise<IUser> {
+    const userIndex = this.users.findIndex((user) => user.id === id);
+    if (userIndex === -1)
+      throw new BadRequestException({
+        statusCode: 404,
+        message: 'bad request',
+      });
+    return (this.users[userIndex] = {
+      ...this.users[userIndex],
+      ...body,
+    });
   }
 }
