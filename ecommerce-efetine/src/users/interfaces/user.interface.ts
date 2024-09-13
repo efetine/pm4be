@@ -1,10 +1,10 @@
 export interface IUser {
-  id: number;
+  id: string;
   email: string;
   name: string;
   password: string;
   address: string;
-  phone: string;
-  country: string | undefined;
-  city: string | undefined;
+  phone: number;
+  country: string;
+  city: string;
 }

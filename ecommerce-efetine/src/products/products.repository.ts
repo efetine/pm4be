@@ -103,15 +103,10 @@ export class productsRepository {
   }
 
   async create(body: CreateProductDto): Promise<IProduct> {
-    return {
-      id: 10,
-      name: 'Solar Power Bank',
-      description:
-        'A portable power bank with solar charging and dual USB outputs.',
-      price: 59.99,
-      stock: true,
-      imgUrl: 'https://example.com/images/solar-power-bank.jpg',
-    };
+    const newProductId = this.products.length + 1;
+    const newProduct = { id: newProductId, ...body };
+    this.products.push(newProduct);
+    return newProduct;
   }
 
   async findOne(id: number): Promise<IProduct> {
