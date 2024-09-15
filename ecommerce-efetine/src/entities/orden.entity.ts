@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { UUID } from 'typeorm/driver/mongodb/bson.typings.js';
+import { v4 as UUID } from 'uuid';
 
 @Entity({ name: 'orders' })
 export class Order {

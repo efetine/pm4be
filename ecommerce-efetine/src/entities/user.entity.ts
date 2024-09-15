@@ -1,15 +1,16 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { IUser } from '../users/interfaces/user.interface';
+
+import { v4 as UUID } from 'uuid';
 
 @Entity({ name: 'users' })
-export class User implements IUser {
+export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string = UUID();
 
   @Column({ length: 50, nullable: false })
   name: string;
 
-  @Column({ length: 50, nullable: false, unique: true })
+  @Column({ length: 80, nullable: false, unique: true })
   email: string;
 
   @Column({ length: 20, nullable: false })

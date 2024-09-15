@@ -7,12 +7,14 @@ import {
   Delete,
   Put,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { IProduct } from './interfaces/products.interfaces';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { PaginationsDTO } from '../dto/pagination.dto';
 
 @Controller('/products')
 @ApiTags('products')
@@ -31,16 +33,18 @@ export class ProductsController {
   @Get()
   @ApiOperation({ summary: 'Get all products' })
   @ApiResponse({ status: 200, description: 'return all products' })
-  async findAll(): Promise<IProduct[]> {
-    return await this.productsService.findAll();
+  async findAll(@Query() query: PaginationsDTO): Promise<IProduct[]> {
+    const { page = 0, limit = 5 } = query;
+
+    return await this.productsService.findAll({ page, limit });
   }
 
   @HttpCode(200)
   @Get(':id')
   @ApiOperation({ summary: 'Get product' })
   @ApiResponse({ status: 200, description: 'return product by id' })
-  async findOne(@Param('id') id: string): Promise<IProduct> {
-    return await this.productsService.findOne(+id);
+  async findOne(@Param('id') id: IProduct['id']): Promise<IProduct> {
+    return await this.productsService.findOne(id);
   }
 
   @HttpCode(200)
@@ -48,17 +52,17 @@ export class ProductsController {
   @ApiOperation({ summary: 'update product' })
   @ApiResponse({ status: 200, description: 'return product' })
   async update(
-    @Param('id') id: string,
+    @Param('id') id: IProduct['id'],
     @Body() body: UpdateProductDto,
   ): Promise<IProduct> {
-    return await this.productsService.update(+id, body);
+    return await this.productsService.update(id, body);
   }
 
   @HttpCode(200)
   @Delete(':id')
   @ApiOperation({ summary: 'delete at product' })
   @ApiResponse({ status: 200, description: 'return ok' })
-  async delete(@Param('id') id: string): Promise<boolean> {
-    return this.productsService.delete(+id);
+  async delete(@Param('id') id: IProduct['id']): Promise<boolean> {
+    return this.productsService.delete(id);
   }
 }

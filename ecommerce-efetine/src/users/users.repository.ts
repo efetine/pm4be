@@ -3,46 +3,47 @@ import { IUser } from './interfaces/user.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserOutput } from './interfaces/create-user-output';
+import { v4 as UUID } from 'uuid';
 @Injectable()
 export class usersRepository {
   private users: IUser[] = [
     {
-      id: 1,
+      id: '1',
       email: 'michael.scott@example.com',
       name: 'Michael Scott',
       password: 'dundermifflin123',
       address: '100 Paper St',
-      phone: '+142536478',
+      phone: 142536478,
       country: 'USA',
       city: 'Scranton',
     },
     {
-      id: 2,
+      id: '2',
       email: 'pam.beesly@example.com',
       name: 'Pam Beesly',
       password: 'artislife789',
       address: '200 Art Ln',
-      phone: '+987612345',
+      phone: 987612345,
       country: 'USA',
       city: 'Scranton',
     },
     {
-      id: 3,
+      id: '3',
       email: 'jim.halpert@example.com',
       name: 'Jim Halpert',
       password: 'bigTuna2021',
       address: '150 Sales Ave',
-      phone: '+193847562',
+      phone: 193847562,
       country: 'USA',
       city: 'Philadelphia',
     },
     {
-      id: 4,
+      id: '4',
       email: 'dwight.schrute@example.com',
       name: 'Dwight Schrute',
       password: 'beetfarm456',
       address: '172 Schrute Farms',
-      phone: '+564738291',
+      phone: 564738291,
       country: 'USA',
       city: 'Scranton',
     },
@@ -59,12 +60,12 @@ export class usersRepository {
   }
 
   async create(body: CreateUserDto): Promise<IUser> {
-    const newUserId = this.users.length + 1;
+    const newUserId = UUID();
     const newUser = { id: newUserId, ...body };
     this.users.push(newUser);
     return newUser;
   }
-  async findOne(id: number): Promise<UserOutput> {
+  async findOne(id: IUser['id']): Promise<UserOutput> {
     const user = this.users.find((user) => user.id === id);
 
     if (user === undefined)
@@ -80,7 +81,7 @@ export class usersRepository {
     return rest;
   }
 
-  async delete(id: number): Promise<boolean> {
+  async delete(id: IUser['id']): Promise<boolean> {
     const index = this.users.findIndex((user) => user.id === id);
     if (index === -1)
       throw new BadRequestException({
@@ -91,7 +92,7 @@ export class usersRepository {
     return true;
   }
 
-  async update(body: UpdateUserDto, id: number): Promise<IUser> {
+  async update(body: UpdateUserDto, id: IUser['id']): Promise<IUser> {
     const userIndex = this.users.findIndex((user) => user.id === id);
     if (userIndex === -1)
       throw new BadRequestException({

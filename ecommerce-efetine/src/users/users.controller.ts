@@ -40,8 +40,8 @@ export class UsersController {
   @Get(':id')
   @ApiOperation({ summary: 'Get user' })
   @ApiResponse({ status: 200, description: 'return user by id' })
-  async findOne(@Param('id') id: string): Promise<UserOutput> {
-    return await this.usersService.findOne(+id);
+  async findOne(@Param('id') id: IUser['id']): Promise<UserOutput> {
+    return await this.usersService.findOne(id);
   }
 
   @HttpCode(200)
@@ -49,17 +49,17 @@ export class UsersController {
   @ApiOperation({ summary: 'update user' })
   @ApiResponse({ status: 200, description: 'return user' })
   async update(
-    @Param('id') id: string,
+    @Param('id') id: IUser['id'],
     @Body() body: UpdateUserDto,
   ): Promise<IUser> {
-    return await this.usersService.update(body, Number(id));
+    return await this.usersService.update(body, id);
   }
 
   @HttpCode(200)
   @Delete(':id')
   @ApiOperation({ summary: 'delete at user' })
   @ApiResponse({ status: 200, description: 'return ok' })
-  async delete(@Param('id') id: string): Promise<boolean> {
-    return await this.usersService.delete(+id);
+  async delete(@Param('id') id: IUser['id']): Promise<boolean> {
+    return await this.usersService.delete(id);
   }
 }

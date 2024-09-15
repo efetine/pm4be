@@ -17,15 +17,15 @@ export class UsersService {
     return this.usersRepository.findAll();
   }
 
-  async findOne(id: number): Promise<UserOutput> {
+  async findOne(id: IUser['id']): Promise<UserOutput> {
     return this.usersRepository.findOne(id);
   }
 
-  async update(body: UpdateUserDto, id: number): Promise<IUser> {
+  async update(body: UpdateUserDto, id: IUser['id']): Promise<IUser> {
     return await this.usersRepository.update(body, id);
   }
 
-  async delete(id: number): Promise<boolean> {
+  async delete(id: IUser['id']): Promise<boolean> {
     return this.usersRepository.delete(id);
   }
 }

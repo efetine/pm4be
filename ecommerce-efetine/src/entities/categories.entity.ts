@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { UUID } from 'typeorm/driver/mongodb/bson.typings.js';
+import { v4 as UUID } from 'uuid';
 
 @Entity({ name: 'categories' })
 export class Categorie {

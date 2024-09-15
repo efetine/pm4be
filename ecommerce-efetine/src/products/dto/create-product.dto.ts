@@ -1,9 +1,7 @@
 import {
-  IsBoolean,
   IsInt,
   IsNotEmpty,
   IsNumber,
-  IsPositive,
   IsString,
   IsUrl,
   Length,
@@ -33,14 +31,15 @@ export class CreateProductDto {
   @Matches(/^\d{1,8}(\.\d{1,2})?$/, {
     message: 'Price must have up to 10 digits and 2 decimal places',
   })
-  @IsPositive()
+  @IsInt()
+  @Min(0)
   price: number;
 
   @IsNotEmpty()
-  @IsBoolean()
+  @IsNumber()
   @IsInt()
   @Min(0)
-  stock: boolean;
+  stock: number;
 
   @IsNotEmpty()
   @IsString()

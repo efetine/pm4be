@@ -3,6 +3,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { productsRepository } from './products.repository';
 import { IProduct } from './interfaces/products.interfaces';
+import { PaginationsDTO } from '../dto/pagination.dto';
 
 @Injectable()
 export class ProductsService {
@@ -11,19 +12,19 @@ export class ProductsService {
     return await this.productsRepository.create(body);
   }
 
-  async findAll(): Promise<IProduct[]> {
-    return await this.productsRepository.findAll();
+  async findAll(pagination: PaginationsDTO): Promise<IProduct[]> {
+    return await this.productsRepository.findAll(pagination);
   }
 
-  async findOne(id: number): Promise<IProduct> {
+  async findOne(id: IProduct['id']): Promise<IProduct> {
     return await this.productsRepository.findOne(id);
   }
 
-  async update(id: number, body: UpdateProductDto): Promise<IProduct> {
+  async update(id: IProduct['id'], body: UpdateProductDto): Promise<IProduct> {
     return await this.productsRepository.update(id, body);
   }
 
-  async delete(id: number): Promise<boolean> {
+  async delete(id: IProduct['id']): Promise<boolean> {
     return await this.productsRepository.delete(id);
   }
 }

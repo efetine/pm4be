@@ -1,10 +1,9 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { IProduct } from '../products/interfaces/products.interfaces';
-import { v4 as UUID } from 'typeorm/driver/mongodb/bson.typings.js';
 
+import { v4 as UUID } from 'uuid';
 
 @Entity({ name: 'products' })
-export class Product implements IProduct {
+export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string = UUID();
 
@@ -20,7 +19,6 @@ export class Product implements IProduct {
   @Column({ type: 'integer', nullable: false })
   stock: number;
 
-
   @Column()
   imgUrl: string;
 
@@ -29,5 +27,5 @@ export class Product implements IProduct {
   //   if (!this.imgUrl) {
   //     this.imgUrl = 'aca va la ruta real de la imagen que deseo utilizar;
   //   }
-  }
+  // }
 }
