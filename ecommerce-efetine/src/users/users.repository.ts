@@ -1,107 +1,97 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { IUser } from './interfaces/user.interface';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { User } from '../entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserOutput } from './interfaces/create-user-output';
-import { v4 as UUID } from 'uuid';
+import { IUser } from './interfaces/user.interface';
 @Injectable()
 export class usersRepository {
-  private users: IUser[] = [
-    {
-      id: '1',
-      email: 'michael.scott@example.com',
-      name: 'Michael Scott',
-      password: 'dundermifflin123',
-      address: '100 Paper St',
-      phone: 142536478,
-      country: 'USA',
-      city: 'Scranton',
-    },
-    {
-      id: '2',
-      email: 'pam.beesly@example.com',
-      name: 'Pam Beesly',
-      password: 'artislife789',
-      address: '200 Art Ln',
-      phone: 987612345,
-      country: 'USA',
-      city: 'Scranton',
-    },
-    {
-      id: '3',
-      email: 'jim.halpert@example.com',
-      name: 'Jim Halpert',
-      password: 'bigTuna2021',
-      address: '150 Sales Ave',
-      phone: 193847562,
-      country: 'USA',
-      city: 'Philadelphia',
-    },
-    {
-      id: '4',
-      email: 'dwight.schrute@example.com',
-      name: 'Dwight Schrute',
-      password: 'beetfarm456',
-      address: '172 Schrute Farms',
-      phone: 564738291,
-      country: 'USA',
-      city: 'Scranton',
-    },
-  ];
-
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
   async findAll(): Promise<UserOutput[]> {
-    const usersWithoutPasswords = this.users.map((user) => {
-      const { password, ...rest } = user;
-
-      return rest;
+    const users = await this.usersRepository.find({
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        city: true,
+        country: true,
+        email: true,
+        phone: true,
+      },
     });
 
-    return usersWithoutPasswords;
+    return users;
   }
 
-  async create(body: CreateUserDto): Promise<IUser> {
-    const newUserId = UUID();
-    const newUser = { id: newUserId, ...body };
-    this.users.push(newUser);
-    return newUser;
-  }
-  async findOne(id: IUser['id']): Promise<UserOutput> {
-    const user = this.users.find((user) => user.id === id);
+  async create(body: CreateUserDto): Promise<UserOutput> {
+    const user = this.usersRepository.create(body);
+    const newUser = await this.usersRepository.save(user);
 
-    if (user === undefined)
-      throw new BadRequestException({
-        statusCode: 404,
-        message: 'bad request',
-      });
-
-    const { password, ...rest } = user;
-
-    // delete user.password;
+    const { password, ...rest } = newUser;
 
     return rest;
   }
+  async findOne(id: IUser['id']): Promise<UserOutput> {
+    const user = await this.usersRepository.findOne({
+      where: {
+        id: id,
+      },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        city: true,
+        country: true,
+        email: true,
+        phone: true,
+      },
+    });
 
-  async delete(id: IUser['id']): Promise<boolean> {
-    const index = this.users.findIndex((user) => user.id === id);
-    if (index === -1)
+    if (user === null)
       throw new BadRequestException({
         statusCode: 404,
         message: 'bad request',
       });
-    this.users.splice(index, 1);
-    return true;
+
+    return user;
   }
 
-  async update(body: UpdateUserDto, id: IUser['id']): Promise<IUser> {
-    const userIndex = this.users.findIndex((user) => user.id === id);
-    if (userIndex === -1)
+  async delete(id: IUser['id']): Promise<void> {
+    const user = await this.usersRepository.delete({
+      id: id,
+    });
+
+    if (user.affected === 0)
       throw new BadRequestException({
         statusCode: 404,
         message: 'bad request',
       });
-    return (this.users[userIndex] = {
-      ...this.users[userIndex],
-      ...body,
-    });
+
+    return;
+  }
+
+  async update(body: UpdateUserDto, id: IUser['id']): Promise<UserOutput> {
+    const user = await this.usersRepository.update(
+      {
+        id: id,
+      },
+      body,
+    );
+
+    if (user.affected === 0)
+      throw new BadRequestException({
+        statusCode: 404,
+        message: 'bad request',
+      });
+
+    // const { password, ...rest } = user.raw;
+
+    return user.raw;
   }
 }

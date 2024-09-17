@@ -1,13 +1,14 @@
 import { registerAs } from '@nestjs/config';
 import { config as dotenvConfig } from 'dotenv';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import { SeederOptions } from 'typeorm-extension';
 
 dotenvConfig({ path: '.env' });
 
-const config = {
+const config: DataSourceOptions & SeederOptions = {
   type: 'postgres',
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
+  port: Number(process.env.DB_PORT),
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
@@ -16,7 +17,9 @@ const config = {
   entities: ['dist/**/*.entity{.ts,.js}'],
   subscribers: [],
   migrations: ['dist/migrations/*{.ts,.js}'],
-  // dropSchema: true,
+  dropSchema: false,
+  seeds: ['dist/database/seeds/**/*{.ts,.js}'],
+  factories: ['dist/database/factories/**/*{.ts,.js}'],
 };
 
 export default registerAs('typeorm', () => config);

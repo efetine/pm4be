@@ -1,13 +1,10 @@
 import {
   IsEmail,
-  IsInt,
   IsNotEmpty,
-  IsNumber,
   IsString,
   Length,
   Matches,
   MaxLength,
-  Min,
   MinLength,
 } from 'class-validator';
 
@@ -42,10 +39,8 @@ export class CreateUserDto {
   address: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  @IsInt()
-  @Min(0)
-  phone: number;
+  @IsString()
+  phone: string;
 
   @IsString()
   @Length(3, 50)

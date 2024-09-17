@@ -1,3 +1,3 @@
 import { IUser } from './user.interface';
 
-export type UserOutput = Omit<IUser, 'password' | 'address'>;
+export type UserOutput = Omit<IUser, 'password'>;

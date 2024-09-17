@@ -1,21 +1,47 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { LoggerGlobal } from './middlewares/middlewares.global.middleware';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+      exceptionFactory: (errors) => {
+        const cleanErrors = errors.map((error) => {
+          if (error.children && error.children.length) {
+            return {
+              property: error.property,
+              children: error.children.map((child) => {
+                if (child.children && child.children.length) {
+                  return {
+                    property: child.property,
+                    children: child.children.map((grandchild) => ({
+                      property: grandchild.property,
+                      constraints: grandchild.constraints,
+                    })),
+                  };
+                }
+                return {
+                  property: child.property,
+                  constraints: child.constraints,
+                };
+              }),
+            };
+          }
+          return { property: error.property, constraints: error.constraints };
+        });
+
+        return new BadRequestException({
+          alert: 'Se han detectado los siguientes errores en la petición:',
+          errors: cleanErrors,
+        });
+      },
+    }),
+  );
   app.use(LoggerGlobal);
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-  const config = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
-    .setVersion('1.0')
-    .addTag('cats')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
   await app.listen(3000);
 }
 bootstrap();

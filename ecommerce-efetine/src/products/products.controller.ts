@@ -8,6 +8,7 @@ import {
   Put,
   HttpCode,
   Query,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -43,7 +44,9 @@ export class ProductsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get product' })
   @ApiResponse({ status: 200, description: 'return product by id' })
-  async findOne(@Param('id') id: IProduct['id']): Promise<IProduct> {
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: IProduct['id'],
+  ): Promise<IProduct> {
     return await this.productsService.findOne(id);
   }
 
@@ -52,7 +55,7 @@ export class ProductsController {
   @ApiOperation({ summary: 'update product' })
   @ApiResponse({ status: 200, description: 'return product' })
   async update(
-    @Param('id') id: IProduct['id'],
+    @Param('id', ParseUUIDPipe) id: IProduct['id'],
     @Body() body: UpdateProductDto,
   ): Promise<IProduct> {
     return await this.productsService.update(id, body);
@@ -62,7 +65,9 @@ export class ProductsController {
   @Delete(':id')
   @ApiOperation({ summary: 'delete at product' })
   @ApiResponse({ status: 200, description: 'return ok' })
-  async delete(@Param('id') id: IProduct['id']): Promise<boolean> {
+  async delete(
+    @Param('id', ParseUUIDPipe) id: IProduct['id'],
+  ): Promise<boolean> {
     return this.productsService.delete(id);
   }
 }

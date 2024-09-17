@@ -6,7 +6,7 @@ import { LoginAuthDto } from './dto/login-auth.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
+  @Post('/login') //sign in
   async login(@Body() body: LoginAuthDto): Promise<boolean> {
     return await this.authService.login(body);
   }

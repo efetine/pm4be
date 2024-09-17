@@ -1,19 +1,20 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
+  Controller,
   Delete,
-  Put,
+  Get,
   HttpCode,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Put,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateUserDto } from './dto/create-user.dto';
-import { IUser } from './interfaces/user.interface';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserOutput } from './interfaces/create-user-output';
+import { IUser } from './interfaces/user.interface';
+import { UsersService } from './users.service';
 
 @Controller('/users')
 @ApiTags('users')
@@ -24,7 +25,7 @@ export class UsersController {
   @Post()
   @ApiOperation({ summary: 'create a user' })
   @ApiResponse({ status: 201, description: 'return a user' })
-  async create(@Body() body: CreateUserDto): Promise<IUser> {
+  async create(@Body() body: CreateUserDto): Promise<UserOutput> {
     return await this.usersService.create(body);
   }
 
@@ -40,7 +41,9 @@ export class UsersController {
   @Get(':id')
   @ApiOperation({ summary: 'Get user' })
   @ApiResponse({ status: 200, description: 'return user by id' })
-  async findOne(@Param('id') id: IUser['id']): Promise<UserOutput> {
+  async findOne(
+    @Param('id', ParseUUIDPipe) id: IUser['id'],
+  ): Promise<UserOutput> {
     return await this.usersService.findOne(id);
   }
 
@@ -49,9 +52,9 @@ export class UsersController {
   @ApiOperation({ summary: 'update user' })
   @ApiResponse({ status: 200, description: 'return user' })
   async update(
-    @Param('id') id: IUser['id'],
+    @Param('id', ParseUUIDPipe) id: IUser['id'],
     @Body() body: UpdateUserDto,
-  ): Promise<IUser> {
+  ): Promise<UserOutput> {
     return await this.usersService.update(body, id);
   }
 
@@ -59,7 +62,7 @@ export class UsersController {
   @Delete(':id')
   @ApiOperation({ summary: 'delete at user' })
   @ApiResponse({ status: 200, description: 'return ok' })
-  async delete(@Param('id') id: IUser['id']): Promise<boolean> {
+  async delete(@Param('id', ParseUUIDPipe) id: IUser['id']): Promise<void> {
     return await this.usersService.delete(id);
   }
 }
