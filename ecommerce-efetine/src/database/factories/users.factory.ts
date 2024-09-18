@@ -1,3 +1,4 @@
+import { hashSync } from 'bcrypt';
 import { setSeederFactory } from 'typeorm-extension';
 import { User } from '../../entities/user.entity';
 
@@ -9,7 +10,10 @@ export default setSeederFactory(User, (faker) => {
   user.city = faker.location.city();
   user.country = faker.location.country();
   user.phone = faker.phone.number();
-  user.password = faker.internet.password();
+
+  const password = faker.internet.password();
+  const hashedPassword = hashSync(password, 15);
+  user.password = hashedPassword;
 
   return user;
 });

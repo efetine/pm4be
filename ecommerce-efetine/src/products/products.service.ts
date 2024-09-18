@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { PaginationsDTO } from '../dto/pagination.dto';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { productsRepository } from './products.repository';
 import { IProduct } from './interfaces/products.interfaces';
-import { PaginationsDTO } from '../dto/pagination.dto';
+import { productsRepository } from './products.repository';
 
 @Injectable()
 export class ProductsService {
@@ -24,7 +24,7 @@ export class ProductsService {
     return await this.productsRepository.update(id, body);
   }
 
-  async delete(id: IProduct['id']): Promise<boolean> {
+  async delete(id: IProduct['id']): Promise<void> {
     return await this.productsRepository.delete(id);
   }
 }

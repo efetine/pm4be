@@ -1,21 +1,22 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
+  Controller,
   Delete,
-  Put,
+  Get,
   HttpCode,
-  Query,
+  Param,
   ParseUUIDPipe,
+  Post,
+  Put,
+  Query,
 } from '@nestjs/common';
-import { ProductsService } from './products.service';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { PaginationsDTO } from '../dto/pagination.dto';
+import { Public } from '../utils/public.decorator';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { IProduct } from './interfaces/products.interfaces';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { PaginationsDTO } from '../dto/pagination.dto';
+import { ProductsService } from './products.service';
 
 @Controller('/products')
 @ApiTags('products')
@@ -30,6 +31,7 @@ export class ProductsController {
     return await this.productsService.create(body);
   }
 
+  @Public()
   @HttpCode(200)
   @Get()
   @ApiOperation({ summary: 'Get all products' })
@@ -40,6 +42,7 @@ export class ProductsController {
     return await this.productsService.findAll({ page, limit });
   }
 
+  @Public()
   @HttpCode(200)
   @Get(':id')
   @ApiOperation({ summary: 'Get product' })
@@ -65,9 +68,11 @@ export class ProductsController {
   @Delete(':id')
   @ApiOperation({ summary: 'delete at product' })
   @ApiResponse({ status: 200, description: 'return ok' })
-  async delete(
-    @Param('id', ParseUUIDPipe) id: IProduct['id'],
-  ): Promise<boolean> {
-    return this.productsService.delete(id);
+  async delete(@Param('id', ParseUUIDPipe) id: IProduct['id']): Promise<void> {
+    try {
+      return this.productsService.delete(id);
+    } catch {
+      throw new Error('Cannot delete user');
+    }
   }
 }

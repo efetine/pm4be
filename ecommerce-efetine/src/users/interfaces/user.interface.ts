@@ -7,4 +7,5 @@ export interface IUser {
   phone: string;
   country: string;
   city: string;
+  admin: boolean;
 }

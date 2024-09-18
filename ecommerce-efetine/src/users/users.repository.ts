@@ -1,14 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { compare } from 'bcrypt';
 import { Repository } from 'typeorm';
 
+import { LoginAuthDto } from '../auth/dto/login-auth.dto';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserOutput } from './interfaces/create-user-output';
 import { IUser } from './interfaces/user.interface';
 @Injectable()
-export class usersRepository {
+export class UsersRepository {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
@@ -62,6 +64,24 @@ export class usersRepository {
     return user;
   }
 
+  async findOneByCred(login: LoginAuthDto): Promise<UserOutput> {
+    const user = await this.usersRepository.findOne({
+      where: {
+        email: login.email,
+      },
+    });
+
+    if (user === null) throw new Error('User not found');
+
+    const valid = await compare(login.password, user.password);
+
+    if (valid === false) throw new Error('Password not valid');
+
+    const { password, ...rest } = user;
+
+    return rest;
+  }
+
   async delete(id: IUser['id']): Promise<void> {
     const user = await this.usersRepository.delete({
       id: id,
@@ -89,8 +109,6 @@ export class usersRepository {
         statusCode: 404,
         message: 'bad request',
       });
-
-    // const { password, ...rest } = user.raw;
 
     return user.raw;
   }

@@ -1,26 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import bcrypt from 'bcrypt';
+import { hash } from 'bcrypt';
 
+import { LoginAuthDto } from '../auth/dto/login-auth.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserOutput } from './interfaces/create-user-output';
 import { IUser } from './interfaces/user.interface';
-import { usersRepository } from './users.repository';
+import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly usersRepository: usersRepository) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
   async create(body: CreateUserDto): Promise<UserOutput> {
-    const { password, address, city, country, email, name, phone } = body;
-    const hashedPassword = await bcrypt.hash(password, 15);
+    const { password, ...rest } = body; // rest operator
+    const hashedPassword = await hash(password, 15);
 
     return this.usersRepository.create({
-      address,
-      city,
-      country,
-      email,
-      name,
-      phone,
+      ...rest, //spread operator
       password: hashedPassword,
     });
   }
@@ -31,6 +27,10 @@ export class UsersService {
 
   async findOne(id: IUser['id']): Promise<UserOutput> {
     return this.usersRepository.findOne(id);
+  }
+
+  async findOneByCred(login: LoginAuthDto): Promise<UserOutput> {
+    return this.usersRepository.findOneByCred(login);
   }
 
   async update(body: UpdateUserDto, id: IUser['id']): Promise<UserOutput> {

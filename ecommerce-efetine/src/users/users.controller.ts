@@ -8,8 +8,11 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { IsAdminGuard } from '../auth/guard/is-admin.guard';
+import { Public } from '../utils/public.decorator';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserOutput } from './interfaces/create-user-output';
@@ -21,6 +24,7 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Public()
   @HttpCode(201)
   @Post()
   @ApiOperation({ summary: 'create a user' })
@@ -29,6 +33,8 @@ export class UsersController {
     return await this.usersService.create(body);
   }
 
+  // @UseGuards(AuthGuard)
+  @UseGuards(IsAdminGuard)
   @HttpCode(200)
   @Get()
   @ApiOperation({ summary: 'Get all users' })

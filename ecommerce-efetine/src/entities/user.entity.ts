@@ -14,7 +14,7 @@ export class User implements IUser {
   @Column({ length: 80, nullable: false, unique: true })
   email: string;
 
-  @Column({ length: 20, nullable: false })
+  @Column({ nullable: false })
   password: string;
 
   @Column({ nullable: false })
@@ -28,4 +28,7 @@ export class User implements IUser {
 
   @Column({ length: 50, nullable: false })
   city: string;
+
+  @Column({ default: false })
+  admin: boolean;
 }
