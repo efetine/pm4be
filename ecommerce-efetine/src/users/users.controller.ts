@@ -6,14 +6,11 @@ import {
   HttpCode,
   Param,
   ParseUUIDPipe,
-  Post,
-  Put,
+  Patch,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { IsAdminGuard } from '../auth/guard/is-admin.guard';
-import { Public } from '../utils/public.decorator';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserOutput } from './interfaces/create-user-output';
 import { IUser } from './interfaces/user.interface';
@@ -24,14 +21,14 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Public()
-  @HttpCode(201)
-  @Post()
-  @ApiOperation({ summary: 'create a user' })
-  @ApiResponse({ status: 201, description: 'return a user' })
-  async create(@Body() body: CreateUserDto): Promise<UserOutput> {
-    return await this.usersService.create(body);
-  }
+  // @Public()
+  // @HttpCode(201)
+  // @Post()
+  // @ApiOperation({ summary: 'create a user' })
+  // @ApiResponse({ status: 201, description: 'return a user' })
+  // async create(@Body() body: CreateUserDto): Promise<UserOutput> {
+  //   return await this.usersService.create(body);
+  // }
 
   // @UseGuards(AuthGuard)
   @UseGuards(IsAdminGuard)
@@ -54,7 +51,7 @@ export class UsersController {
   }
 
   @HttpCode(200)
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({ summary: 'update user' })
   @ApiResponse({ status: 200, description: 'return user' })
   async update(

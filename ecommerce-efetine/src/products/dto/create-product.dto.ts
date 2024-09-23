@@ -5,7 +5,6 @@ import {
   IsString,
   IsUrl,
   Length,
-  Matches,
   MaxLength,
   Min,
   MinLength,
@@ -28,10 +27,9 @@ export class CreateProductDto {
 
   @IsNotEmpty()
   @IsNumber({ maxDecimalPlaces: 2 })
-  @Matches(/^\d{1,8}(\.\d{1,2})?$/, {
-    message: 'Price must have up to 10 digits and 2 decimal places',
-  })
-  @IsInt()
+  // @Matches(/^\d{1,8}(\.\d{1,2})?$/, {
+  //   message: 'Price must have up to 10 digits and 2 decimal places',
+  // })
   @Min(0)
   price: number;
 

@@ -1,28 +1,81 @@
-// import { InjectRepository } from '@nestjs/typeorm';
-// import { injectable } from '@nestjs/common';
-// import { Repository } from 'typeorm';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
-// @injectable()
-// export class CategoriesRepository {
-//   constructor(
-//     @InjectRepository(Categories)
-//     private categoriesRepository: Repository<categories>,
-//   ) {}
-//   async findAll() {
-//     return await this.categoriesRepository.find();
-//   }
+import { Category } from '../entities/category.entity';
+import { CreateCategoryDto } from './dto/create-category.dto';
 
-//   async create() {
-//     data?.map(async (element) => {
-//       await this.categoriesReposiyory
+@Injectable()
+export class CategoriesRepository {
+  constructor(
+    @InjectRepository(Category)
+    private categoriesRepository: Repository<Category>,
+  ) {}
+  async findAll() {
+    return this.categoriesRepository.find();
+  }
 
-//         .createQueryBuilder()
-//         .insert()
-//         .into(Categories)
-//         .values({ name: element.category })
-//         .orIgnore()
-//         .execute();
-//     });
-//     return 'Create Category';
-//   }
-// }
+  async findOne(id: Category['id']) {
+    const category = this.categoriesRepository.findOneBy({
+      id,
+    });
+
+    return category;
+  }
+
+  async create(input: CreateCategoryDto) {
+    const categoryEntity = this.categoriesRepository.create(input);
+    try {
+      const category = await this.categoriesRepository.save(categoryEntity);
+      return category;
+    } catch {
+      throw new Error('Cannot create category');
+    }
+  }
+
+  async delete(id: Category['id']) {
+    let result = null;
+    try {
+      result = await this.categoriesRepository.delete(id);
+    } catch {
+      throw new Error('Cannot delete category');
+    }
+
+    if (result.affected === 0) {
+      throw new Error('Category not found');
+    }
+
+    return;
+  }
+
+  async update(id: Category['id'], input: CreateCategoryDto) {
+    let result = null;
+    try {
+      result = await this.categoriesRepository.update(id, input);
+    } catch {
+      throw new InternalServerErrorException();
+    }
+
+    if (result.affected === 0) {
+      throw new NotFoundException();
+    }
+
+    return;
+  }
+
+  // async create(): Promise<void> {
+  //   data?.map(async (element) => {
+  //     await this.CategoriesRepository.createQueryBuilder()
+  //       .insert()
+  //       .into(Categories)
+  //       .values({ name: element.category })
+  //       .orIgnore()
+  //       .execute();
+  //   });
+  //   return 'Create Category';
+  // }
+}

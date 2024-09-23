@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { UserOutput } from '../users/interfaces/create-user-output';
 import { UsersService } from '../users/users.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { TokenDTO } from './dto/token-dto';
@@ -26,5 +28,9 @@ export class AuthService {
     return {
       access_token,
     };
+  }
+
+  async create(body: CreateUserDto): Promise<UserOutput> {
+    return this.usersService.create(body);
   }
 }

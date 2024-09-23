@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PaginationsDTO } from '../dto/pagination.dto';
@@ -15,7 +15,11 @@ export class productsRepository {
   ) {}
 
   async findAll(pagination: PaginationsDTO): Promise<IProduct[]> {
-    const products = await this.productsRepository.find();
+    const products = await this.productsRepository.find({
+      relations: {
+        category: true,
+      },
+    });
     return products;
   }
 
@@ -32,11 +36,7 @@ export class productsRepository {
       },
     });
 
-    if (!product)
-      throw new BadRequestException({
-        statusCode: 404,
-        message: 'bad request',
-      });
+    if (!product) throw new NotFoundException();
 
     return product;
   }
@@ -46,11 +46,7 @@ export class productsRepository {
       id: id,
     });
 
-    if (product.affected === 0)
-      throw new BadRequestException({
-        statusCode: 404,
-        message: 'bad request',
-      });
+    if (product.affected === 0) throw new NotFoundException();
 
     return;
   }
@@ -62,11 +58,7 @@ export class productsRepository {
       },
       body,
     );
-    if (product.affected === 0)
-      throw new BadRequestException({
-        statusCode: 404,
-        message: 'bad request',
-      });
+    if (product.affected === 0) throw new NotFoundException();
 
     return product.raw;
   }

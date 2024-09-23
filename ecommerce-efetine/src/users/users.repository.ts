@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { compare } from 'bcrypt';
 import { Repository } from 'typeorm';
@@ -53,13 +53,12 @@ export class UsersRepository {
         email: true,
         phone: true,
       },
+      relations: {
+        orders: true,
+      },
     });
 
-    if (user === null)
-      throw new BadRequestException({
-        statusCode: 404,
-        message: 'bad request',
-      });
+    if (user === null) throw new NotFoundException();
 
     return user;
   }
@@ -87,11 +86,7 @@ export class UsersRepository {
       id: id,
     });
 
-    if (user.affected === 0)
-      throw new BadRequestException({
-        statusCode: 404,
-        message: 'bad request',
-      });
+    if (user.affected === 0) throw new NotFoundException();
 
     return;
   }
@@ -104,11 +99,7 @@ export class UsersRepository {
       body,
     );
 
-    if (user.affected === 0)
-      throw new BadRequestException({
-        statusCode: 404,
-        message: 'bad request',
-      });
+    if (user.affected === 0) throw new NotFoundException();
 
     return user.raw;
   }

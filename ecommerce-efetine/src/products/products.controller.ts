@@ -6,8 +6,8 @@ import {
   HttpCode,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
-  Put,
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -54,7 +54,7 @@ export class ProductsController {
   }
 
   @HttpCode(200)
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({ summary: 'update product' })
   @ApiResponse({ status: 200, description: 'return product' })
   async update(

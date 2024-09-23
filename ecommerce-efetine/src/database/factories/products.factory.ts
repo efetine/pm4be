@@ -6,7 +6,11 @@ export default setSeederFactory(Product, (faker) => {
   product.name = faker.commerce.productName();
   product.description = faker.commerce.productDescription();
   product.price = parseFloat(faker.commerce.price());
-  product.stock = faker.number.int();
+  product.stock = faker.number.int({
+    max: 100,
+  });
   product.imgUrl = faker.image.url();
+  product.category;
+
   return product;
 });
