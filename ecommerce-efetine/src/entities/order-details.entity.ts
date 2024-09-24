@@ -2,7 +2,7 @@ import {
   Column,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 as UUID } from 'uuid';
@@ -20,11 +20,15 @@ export class OrderDetail {
   @Column({ type: 'int' })
   quantity: number;
 
-  @OneToOne(() => Order)
+  @ManyToOne(() => Order, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'order_id' })
   order: Order;
 
-  @OneToOne(() => Product)
+  @ManyToOne(() => Product, {
+    nullable: false,
+  })
   @JoinColumn({ name: 'product_id' })
   product: Product;
 }

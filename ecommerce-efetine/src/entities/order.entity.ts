@@ -1,8 +1,8 @@
 import {
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 as UUID } from 'uuid';
@@ -17,7 +17,7 @@ export class Order {
   @OneToMany(() => OrderDetail, (orderDetail) => orderDetail.order)
   details: OrderDetail[];
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User)
   @JoinColumn()
   user: User;
 }

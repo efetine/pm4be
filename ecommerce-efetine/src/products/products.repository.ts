@@ -14,11 +14,13 @@ export class productsRepository {
     private productsRepository: Repository<Product>,
   ) {}
 
-  async findAll(pagination: PaginationsDTO): Promise<IProduct[]> {
+  async findAll({ limit = 5, page = 0 }: PaginationsDTO): Promise<IProduct[]> {
     const products = await this.productsRepository.find({
       relations: {
         category: true,
       },
+      take: limit,
+      skip: page * limit,
     });
     return products;
   }

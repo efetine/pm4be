@@ -1,5 +1,9 @@
-import { OrderDetail } from '../../entities/order-details.entity';
+import { ArrayMinSize, IsArray, IsNotEmpty } from 'class-validator';
+import { OrderDetailDto } from './order-detail-dto';
 
 export class CreateOrderDto {
-  details: Pick<OrderDetail, 'quantity' | 'product'>[];
+  @IsNotEmpty()
+  @IsArray()
+  @ArrayMinSize(1)
+  details: OrderDetailDto[];
 }

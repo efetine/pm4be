@@ -12,13 +12,17 @@ export default class ProductsSeeder implements Seeder {
     const categories = dataSource.getRepository(Category);
 
     const category = await categories.find({
-      take: 1,
+      take: 3,
     });
 
     const productsFactory = factoryManager.get(Product);
 
-    await productsFactory.saveMany(30, {
-      category: category[0],
-    });
+    for (let index = 0; index < 6; index++) {
+      let numeroAleatorio = Math.floor(Math.random() * 3);
+
+      await productsFactory.saveMany(5, {
+        category: category[numeroAleatorio],
+      });
+    }
   }
 }
