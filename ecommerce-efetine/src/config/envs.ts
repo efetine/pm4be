@@ -8,4 +8,7 @@ export const {
   DB_NAME,
   PORT,
   JWT_SECRET,
+  CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_API_KEY,
+  CLOUDINARY_API_SECRET,
 } = process.env;

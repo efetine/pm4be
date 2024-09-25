@@ -24,7 +24,7 @@ export class OrdersService {
     });
   }
 
-  findOne(id: Order['id']) {
-    return `This action returns a #${id} order`;
+  async findOne(id: Order['id']) {
+    return this.orderRepository.findOne(id);
   }
 }

@@ -45,7 +45,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get user' })
   @ApiResponse({ status: 200, description: 'return user by id' })
   async findOne(
-    @Param('id', ParseUUIDPipe) id: IUser['id'],
+    @Param('id', new ParseUUIDPipe()) id: IUser['id'],
   ): Promise<UserOutput> {
     return await this.usersService.findOne(id);
   }
@@ -55,7 +55,7 @@ export class UsersController {
   @ApiOperation({ summary: 'update user' })
   @ApiResponse({ status: 200, description: 'return user' })
   async update(
-    @Param('id', ParseUUIDPipe) id: IUser['id'],
+    @Param('id', new ParseUUIDPipe()) id: IUser['id'],
     @Body() body: UpdateUserDto,
   ): Promise<UserOutput> {
     return await this.usersService.update(body, id);
@@ -65,7 +65,9 @@ export class UsersController {
   @Delete(':id')
   @ApiOperation({ summary: 'delete at user' })
   @ApiResponse({ status: 200, description: 'return ok' })
-  async delete(@Param('id', ParseUUIDPipe) id: IUser['id']): Promise<void> {
+  async delete(
+    @Param('id', new ParseUUIDPipe()) id: IUser['id'],
+  ): Promise<void> {
     return await this.usersService.delete(id);
   }
 }

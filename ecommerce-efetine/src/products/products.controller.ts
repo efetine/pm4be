@@ -48,7 +48,7 @@ export class ProductsController {
   @ApiOperation({ summary: 'Get product' })
   @ApiResponse({ status: 200, description: 'return product by id' })
   async findOne(
-    @Param('id', ParseUUIDPipe) id: IProduct['id'],
+    @Param('id', new ParseUUIDPipe()) id: IProduct['id'],
   ): Promise<IProduct> {
     return await this.productsService.findOne(id);
   }
@@ -58,7 +58,7 @@ export class ProductsController {
   @ApiOperation({ summary: 'update product' })
   @ApiResponse({ status: 200, description: 'return product' })
   async update(
-    @Param('id', ParseUUIDPipe) id: IProduct['id'],
+    @Param('id', new ParseUUIDPipe()) id: IProduct['id'],
     @Body() body: UpdateProductDto,
   ): Promise<IProduct> {
     return await this.productsService.update(id, body);
@@ -68,7 +68,9 @@ export class ProductsController {
   @Delete(':id')
   @ApiOperation({ summary: 'delete at product' })
   @ApiResponse({ status: 200, description: 'return ok' })
-  async delete(@Param('id', ParseUUIDPipe) id: IProduct['id']): Promise<void> {
+  async delete(
+    @Param('id', new ParseUUIDPipe()) id: IProduct['id'],
+  ): Promise<void> {
     try {
       return this.productsService.delete(id);
     } catch {

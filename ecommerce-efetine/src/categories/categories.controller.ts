@@ -5,6 +5,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
 } from '@nestjs/common';
@@ -28,7 +29,7 @@ export class CategoriesController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: Category['id']) {
+  async findOne(@Param('id', new ParseUUIDPipe()) id: Category['id']) {
     const category = await this.categoriesService.findOne(id);
 
     if (category === null) {
@@ -40,14 +41,14 @@ export class CategoriesController {
 
   @Patch(':id')
   update(
-    @Param('id') id: Category['id'],
+    @Param('id', new ParseUUIDPipe()) id: Category['id'],
     @Body() updateCategoryDto: CreateCategoryDto,
   ) {
     return this.categoriesService.update(id, updateCategoryDto);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: Category['id']) {
+  delete(@Param('id', new ParseUUIDPipe()) id: Category['id']) {
     return this.categoriesService.delete(id);
   }
 }

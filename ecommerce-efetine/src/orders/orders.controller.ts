@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  Req,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { JWTPayload } from '../auth/interfaces/jwt-payload';
 import { Order } from '../entities/order.entity';
@@ -17,7 +25,7 @@ export class OrdersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: Order['id']) {
+  async findOne(@Param('id', new ParseUUIDPipe()) id: Order['id']) {
     return this.ordersService.findOne(id);
   }
 }
