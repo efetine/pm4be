@@ -18,14 +18,17 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  async create(@Body() body: CreateOrderDto, @Req() request: Request) {
+  async create(
+    @Body() body: CreateOrderDto,
+    @Req() request: Request,
+  ): Promise<{ order: Order; total: number }> {
     // @ts-ignore
     const user = request['user'] as JWTPayload;
-    return this.ordersService.create(body, user.sub);
+    return await this.ordersService.create(body, user.sub);
   }
 
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe()) id: Order['id']) {
-    return this.ordersService.findOne(id);
+    return await this.ordersService.findOne(id);
   }
 }

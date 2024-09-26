@@ -11,7 +11,10 @@ export class OrdersService {
     private readonly orderRepository: OrdersRepository,
     private readonly ordersDetailsService: OrderDetailsService,
   ) {}
-  async create(order: CreateOrderDto, userId: User['id']) {
+  async create(
+    order: CreateOrderDto,
+    userId: User['id'],
+  ): Promise<{ order: Order; total: number }> {
     // Crear cada uno de los detalles de la orden
     const orderDetails = await this.ordersDetailsService.create(order);
 

@@ -15,6 +15,8 @@ export class CategoriesRepository {
     @InjectRepository(Category)
     private categoriesRepository: Repository<Category>,
   ) {}
+
+  public categoriesArray = ['smartphone', 'monitor', 'keyboard', 'mouse'];
   async findAll() {
     return this.categoriesRepository.find();
   }

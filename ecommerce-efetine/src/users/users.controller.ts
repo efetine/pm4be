@@ -42,7 +42,7 @@ export class UsersController {
 
   @HttpCode(200)
   @Get(':id')
-  @ApiOperation({ summary: 'Get user' })
+  @ApiOperation({ summary: 'Get user by id' })
   @ApiResponse({ status: 200, description: 'return user by id' })
   async findOne(
     @Param('id', new ParseUUIDPipe()) id: IUser['id'],
@@ -52,7 +52,7 @@ export class UsersController {
 
   @HttpCode(200)
   @Patch(':id')
-  @ApiOperation({ summary: 'update user' })
+  @ApiOperation({ summary: 'update user by id' })
   @ApiResponse({ status: 200, description: 'return user' })
   async update(
     @Param('id', new ParseUUIDPipe()) id: IUser['id'],
@@ -63,7 +63,7 @@ export class UsersController {
 
   @HttpCode(200)
   @Delete(':id')
-  @ApiOperation({ summary: 'delete at user' })
+  @ApiOperation({ summary: 'delete at user by id' })
   @ApiResponse({ status: 200, description: 'return ok' })
   async delete(
     @Param('id', new ParseUUIDPipe()) id: IUser['id'],

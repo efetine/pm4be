@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Order } from '../entities/order.entity';
+import { Product } from '../entities/product.entity';
 import { CreateOrderRepoDto } from './dto/create-order-repo.dto';
 
 @Injectable()
@@ -15,8 +16,12 @@ export class OrdersRepository {
     private ordersRepository: Repository<Order>,
     private dataSource: DataSource,
   ) {}
-  async create(inputOrder: CreateOrderRepoDto) {
-    let hasError = false;
+  async create(
+    inputOrder: CreateOrderRepoDto,
+  ): Promise<{ order: Order; total: number }> {
+    let error = null;
+    let total = 0;
+    let order: Order | null = null;
 
     // el queryRunner se utiliza para ejecutar consultas y transacciones. control remoto que controlas
     const queryRunner = this.dataSource.createQueryRunner();
@@ -24,14 +29,53 @@ export class OrdersRepository {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
+      const productsIds = inputOrder.details.map((detail) => {
+        return {
+          id: detail.product.id,
+        };
+      });
+
+      // Buscamos el stock de los productos
+      const products = await queryRunner.manager.find(Product, {
+        where: productsIds,
+        select: {
+          id: true,
+          stock: true,
+        },
+      });
+
+      inputOrder.details.forEach((detail) => {
+        const product = products.find(
+          (product) => product.id === detail.product.id,
+        );
+
+        if (product === undefined) {
+          throw new NotFoundException();
+        }
+
+        // Validamos que cada producto tenga suficiente stock
+        if (product.stock < detail.quantity) {
+          throw new InternalServerErrorException(
+            `Product with id ${product.id} doesn't have enought stock`,
+          );
+        }
+
+        // Descontamos la cantidad de cada detalle en cada producto
+        queryRunner.manager.update(Product, product.id, {
+          stock: product.stock - detail.quantity,
+        });
+      });
+
       // Creamos la orden
       const orderEntity = this.ordersRepository.create(inputOrder);
-      const order = await queryRunner.manager.save(orderEntity);
+      order = await queryRunner.manager.save(orderEntity);
 
       // Asignamos la orden a cada detalle de orden // devuelve algo nuevo.. no es destructivo
       // Este método crea una nueva lista de detalles a partir de la lista original, aplicando una función a cada elemento.
       const details = inputOrder.details.map((detail) => {
-        detail.order = order;
+        if (order !== null) {
+          detail.order = order;
+        }
 
         return detail;
       });
@@ -41,9 +85,10 @@ export class OrdersRepository {
 
       // Ejecutamos la transaccion
       await queryRunner.commitTransaction();
+
+      total = this.getTotal(order);
     } catch (err) {
-      console.log({ err });
-      hasError = true;
+      error = err;
       // since we have errors lets rollback the changes we made
       await queryRunner.rollbackTransaction();
     } finally {
@@ -52,18 +97,50 @@ export class OrdersRepository {
       await queryRunner.release();
     }
 
-    if (hasError === true) {
+    if (error !== null) {
+      throw error;
+    }
+
+    if (order === null) {
       throw new InternalServerErrorException();
     }
+
+    return { order, total };
   }
 
   async findOne(id: Order['id']) {
-    const order = this.ordersRepository.findOneBy({
-      id,
+    const order = await this.ordersRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        details: {
+          product: true,
+        },
+        user: true,
+      },
+      select: {
+        user: {
+          name: true,
+        },
+      },
     });
 
     if (order === null) throw new NotFoundException();
 
-    return order;
+    const total = this.getTotal(order);
+
+    return {
+      order,
+      total,
+    };
+  }
+
+  private getTotal(order: Order) {
+    const total = order.details.reduce((acc, detail) => {
+      return acc + detail.quantity * detail.price;
+    }, 0);
+
+    return total;
   }
 }

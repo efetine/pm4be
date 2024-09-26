@@ -1,7 +1,7 @@
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { LoggerGlobal } from './middlewares/middlewares.global.middleware';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -41,6 +41,7 @@ async function bootstrap() {
       },
     }),
   );
+  // app.useGlobalInterceptors(new DateAdderInterceptor());
   app.use(LoggerGlobal);
   await app.listen(3000);
 }
