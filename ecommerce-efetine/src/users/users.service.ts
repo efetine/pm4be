@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { hash } from 'bcrypt';
 
 import { LoginAuthDto } from '../auth/dto/login-auth.dto';
+import { UserOutput } from './dto/create-user-output';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UserByIdDTO } from './dto/id-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UserOutput } from './interfaces/create-user-output';
-import { IUser } from './interfaces/user.interface';
 import { UsersRepository } from './users.repository';
 
 @Injectable()
@@ -25,7 +25,7 @@ export class UsersService {
     return this.usersRepository.findAll();
   }
 
-  async findOne(id: IUser['id']): Promise<UserOutput> {
+  async findOne(id: UserByIdDTO): Promise<UserOutput> {
     return this.usersRepository.findOne(id);
   }
 
@@ -33,11 +33,11 @@ export class UsersService {
     return this.usersRepository.findOneByCred(login);
   }
 
-  async update(body: UpdateUserDto, id: IUser['id']): Promise<UserOutput> {
+  async update(body: UpdateUserDto, id: UserByIdDTO): Promise<UserOutput> {
     return await this.usersRepository.update(body, id);
   }
 
-  async delete(id: IUser['id']): Promise<void> {
+  async delete(id: UserByIdDTO): Promise<void> {
     return this.usersRepository.delete(id);
   }
 }

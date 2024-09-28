@@ -4,14 +4,26 @@ import {
   Delete,
   Get,
   HttpCode,
+  InternalServerErrorException,
   Param,
   ParseUUIDPipe,
   Patch,
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiParam,
+  ApiTags,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { PaginationsDTO } from '../dto/pagination.dto';
+import { Product } from '../entities/product.entity';
 import { Public } from '../utils/public.decorator';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -19,14 +31,21 @@ import { IProduct } from './interfaces/products.interfaces';
 import { ProductsService } from './products.service';
 
 @Controller('/products')
-@ApiTags('products')
+@ApiTags('Products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @HttpCode(201)
   @Post()
-  @ApiOperation({ summary: 'create a product' })
-  @ApiResponse({ status: 201, description: 'create a product' })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a product' })
+  @ApiCreatedResponse({
+    description: 'Product created',
+    schema: {
+      $ref: getSchemaPath(Product),
+    },
+  })
+  @ApiInternalServerErrorResponse()
   async create(@Body() body: CreateProductDto): Promise<IProduct> {
     return await this.productsService.create(body);
   }
@@ -35,7 +54,16 @@ export class ProductsController {
   @HttpCode(200)
   @Get()
   @ApiOperation({ summary: 'Get all products' })
-  @ApiResponse({ status: 200, description: 'return all products' })
+  @ApiOkResponse({
+    description: 'An array of products',
+    schema: {
+      type: 'array',
+      items: {
+        $ref: getSchemaPath(Product),
+      },
+    },
+  })
+  @ApiInternalServerErrorResponse()
   async findAll(@Query() query: PaginationsDTO): Promise<IProduct[]> {
     const { page = 0, limit = 5 } = query;
 
@@ -45,8 +73,24 @@ export class ProductsController {
   @Public()
   @HttpCode(200)
   @Get(':id')
-  @ApiOperation({ summary: 'Get product' })
-  @ApiResponse({ status: 200, description: 'return product by id' })
+  @ApiOperation({ summary: 'Get a product' })
+  @ApiOkResponse({
+    description: 'A specific product',
+    schema: {
+      $ref: getSchemaPath(Product),
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'Product not found',
+  })
+  @ApiInternalServerErrorResponse()
+  @ApiParam({
+    name: 'id',
+    description: 'product id',
+    schema: {
+      type: 'string',
+    },
+  })
   async findOne(
     @Param('id', new ParseUUIDPipe()) id: IProduct['id'],
   ): Promise<IProduct> {
@@ -55,8 +99,25 @@ export class ProductsController {
 
   @HttpCode(200)
   @Patch(':id')
-  @ApiOperation({ summary: 'update product' })
-  @ApiResponse({ status: 200, description: 'return product' })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a product' })
+  @ApiOkResponse({
+    description: 'Product updated',
+    schema: {
+      $ref: getSchemaPath(Product),
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'Product not found',
+  })
+  @ApiInternalServerErrorResponse()
+  @ApiParam({
+    name: 'id',
+    description: 'product id',
+    schema: {
+      type: 'string',
+    },
+  })
   async update(
     @Param('id', new ParseUUIDPipe()) id: IProduct['id'],
     @Body() body: UpdateProductDto,
@@ -66,15 +127,29 @@ export class ProductsController {
 
   @HttpCode(200)
   @Delete(':id')
-  @ApiOperation({ summary: 'delete at product' })
-  @ApiResponse({ status: 200, description: 'return ok' })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete a product' })
+  @ApiOkResponse({
+    description: 'Product deleted',
+  })
+  @ApiNotFoundResponse({
+    description: 'Product not found',
+  })
+  @ApiInternalServerErrorResponse()
+  @ApiParam({
+    name: 'id',
+    description: 'product id',
+    schema: {
+      type: 'string',
+    },
+  })
   async delete(
     @Param('id', new ParseUUIDPipe()) id: IProduct['id'],
   ): Promise<void> {
     try {
       return this.productsService.delete(id);
     } catch {
-      throw new Error('Cannot delete user');
+      throw new InternalServerErrorException('Cannot delete user');
     }
   }
 }

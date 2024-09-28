@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsInt,
   IsNotEmpty,
@@ -16,6 +17,10 @@ export class CreateProductDto {
   @Length(3, 50)
   @MinLength(3)
   @MaxLength(50)
+  @ApiProperty({
+    minimum: 3,
+    maximum: 50,
+  })
   name: string;
 
   @IsNotEmpty()
@@ -23,6 +28,10 @@ export class CreateProductDto {
   @Length(10, 255)
   @MinLength(10)
   @MaxLength(255)
+  @ApiProperty({
+    minimum: 10,
+    maximum: 255,
+  })
   description: string;
 
   @IsNotEmpty()
@@ -31,16 +40,23 @@ export class CreateProductDto {
   //   message: 'Price must have up to 10 digits and 2 decimal places',
   // })
   @Min(0)
+  @ApiProperty({
+    minimum: 0,
+  })
   price: number;
 
   @IsNotEmpty()
   @IsNumber()
   @IsInt()
   @Min(0)
+  @ApiProperty({
+    minimum: 0,
+  })
   stock: number;
 
   @IsNotEmpty()
   @IsString()
   @IsUrl()
+  @ApiProperty()
   imgUrl: string;
 }

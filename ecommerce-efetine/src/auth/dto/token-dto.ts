@@ -1,3 +1,6 @@
-export type TokenDTO = {
+import { ApiProperty } from '@nestjs/swagger';
+
+export class TokenDTO {
+  @ApiProperty()
   access_token: string;
-};
+}

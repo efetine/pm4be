@@ -1,3 +1,5 @@
-import { IUser } from '../interfaces/user.interface';
+import { PickType } from '@nestjs/swagger';
 
-export type UserByIdDTO = Pick<IUser, 'id'>;
+import { User } from '../../entities/user.entity';
+
+export class UserByIdDTO extends PickType(User, ['id'] as const) {}

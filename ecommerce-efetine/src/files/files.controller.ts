@@ -10,15 +10,51 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiCreatedResponse,
+  ApiParam,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { Product } from '../entities/product.entity';
 import { FilesService } from './files.service';
 
 @Controller('files')
+@ApiTags('Files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post('/uploadImage/:productId')
   @UseInterceptors(FileInterceptor('file'))
+  @ApiBearerAuth()
+  @ApiParam({
+    name: 'productId',
+    schema: {
+      type: 'string',
+    },
+    example: '8d3b86a1-14a7-4715-bff6-c95cbd15b960',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiCreatedResponse({
+    description: 'Product image uploaded',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User is not authorized',
+  })
   uploadImage(
     @Param('productId', new ParseUUIDPipe()) productId: Product['id'],
     @UploadedFile(
