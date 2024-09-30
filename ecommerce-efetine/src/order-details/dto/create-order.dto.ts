@@ -1,6 +1,8 @@
-import { OrderDetail } from '../../entities/order-details.entity';
+import { PickType } from '@nestjs/swagger';
+import { OrderDetail } from '../entities/order-details.entity';
 
-export type CreateOrderDetailDto = Pick<
-  OrderDetail,
-  'price' | 'product' | 'quantity'
->;
+export class CreateOrderDetailDto extends PickType(OrderDetail, [
+  'price',
+  'product',
+  'quantity',
+] as const) {}

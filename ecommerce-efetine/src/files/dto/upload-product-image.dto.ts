@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Product } from '../../entities/product.entity';
+import { Product } from '../../products/entities/product.entity';
 
 export class UploadProductImageDto {
   @ApiProperty()

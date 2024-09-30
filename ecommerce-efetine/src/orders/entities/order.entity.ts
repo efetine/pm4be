@@ -8,8 +8,8 @@ import {
 } from 'typeorm';
 import { v4 as UUID } from 'uuid';
 
-import { OrderDetail } from './order-details.entity';
-import { User } from './user.entity';
+import { OrderDetail } from '../../order-details/entities/order-details.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity({ name: 'orders' })
 export class Order {
@@ -18,16 +18,12 @@ export class Order {
   id: string = UUID();
 
   @OneToMany(() => OrderDetail, (orderDetail) => orderDetail.order)
-  @ApiProperty({
-    type: () => [OrderDetail],
-  })
+  @ApiProperty()
   details: OrderDetail[];
 
   @ManyToOne(() => User)
   @ApiProperty()
   @JoinColumn()
-  @ApiProperty({
-    type: () => User,
-  })
+  @ApiProperty()
   user: User;
 }

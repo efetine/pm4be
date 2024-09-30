@@ -6,6 +6,6 @@ export class CreateOrderDto {
   @IsNotEmpty()
   @IsArray()
   @ArrayMinSize(1)
-  @ApiProperty({ type: OrderDetailDto })
+  @ApiProperty({ type: [OrderDetailDto] })
   details: OrderDetailDto[];
 }

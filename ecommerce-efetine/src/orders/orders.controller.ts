@@ -18,20 +18,25 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Request } from 'express';
+
 import { JWTPayload } from '../auth/interfaces/jwt-payload';
-import { Order } from '../entities/order.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { Order } from './entities/order.entity';
 import { OrdersService } from './orders.service';
 
-@Controller('orders')
 @ApiTags('Orders')
+@ApiBearerAuth()
+@Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  @ApiBearerAuth()
-  @ApiCreatedResponse()
-  @ApiUnauthorizedResponse()
+  @ApiCreatedResponse({
+    description: 'Order created',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'User is not authorized',
+  })
   @ApiInternalServerErrorResponse()
   async create(
     @Body() body: CreateOrderDto,
@@ -43,7 +48,6 @@ export class OrdersController {
   }
 
   @Get(':id')
-  @ApiBearerAuth()
   @ApiParam({
     name: 'id',
     description: 'order id',
@@ -63,6 +67,6 @@ export class OrdersController {
   })
   @ApiInternalServerErrorResponse()
   async findOne(@Param('id', new ParseUUIDPipe()) id: Order['id']) {
-    return await this.ordersService.findOne(id);
+    return this.ordersService.findOne(id);
   }
 }

@@ -17,16 +17,14 @@ import {
   ApiOperation,
   ApiParam,
   ApiTags,
-  getSchemaPath,
 } from '@nestjs/swagger';
 
 import { IsAdminGuard } from '../auth/guard/is-admin.guard';
-import { User } from '../entities/user.entity';
 import { UserOutput } from './dto/create-user-output';
-import { UserByIdDTO } from './dto/id-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
+@ApiBearerAuth()
 @Controller('/users')
 @ApiTags('Users')
 export class UsersController {
@@ -35,15 +33,11 @@ export class UsersController {
   @UseGuards(IsAdminGuard)
   @HttpCode(200)
   @Get()
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all users' })
   @ApiOkResponse({
     description: 'An array of users',
     schema: {
       type: 'array',
-      items: {
-        $ref: getSchemaPath(User),
-      },
     },
   })
   @ApiInternalServerErrorResponse()
@@ -53,13 +47,9 @@ export class UsersController {
 
   @HttpCode(200)
   @Get(':id')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get user by id' })
   @ApiOkResponse({
     description: 'A specific user',
-    schema: {
-      $ref: getSchemaPath(User),
-    },
   })
   @ApiNotFoundResponse({
     description: 'User not found',
@@ -73,20 +63,16 @@ export class UsersController {
     },
   })
   async findOne(
-    @Param('id', new ParseUUIDPipe()) id: UserByIdDTO,
+    @Param('id', new ParseUUIDPipe()) userId: string,
   ): Promise<UserOutput> {
-    return await this.usersService.findOne(id);
+    return await this.usersService.findOne(userId);
   }
 
   @HttpCode(200)
   @Patch(':id')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update user by id' })
   @ApiOkResponse({
     description: 'User updated',
-    schema: {
-      $ref: getSchemaPath(User),
-    },
   })
   @ApiNotFoundResponse({
     description: 'User not found',
@@ -99,15 +85,14 @@ export class UsersController {
     },
   })
   async update(
-    @Param('id', new ParseUUIDPipe()) id: UserByIdDTO,
+    @Param('id', new ParseUUIDPipe()) userId: string,
     @Body() body: UpdateUserDto,
-  ): Promise<UserOutput> {
-    return await this.usersService.update(body, id);
+  ): Promise<void> {
+    return this.usersService.update(body, userId);
   }
 
   @HttpCode(200)
   @Delete(':id')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a user by id' })
   @ApiOkResponse({
     description: 'User deleted',
@@ -122,9 +107,7 @@ export class UsersController {
       type: 'string',
     },
   })
-  async delete(
-    @Param('id', new ParseUUIDPipe()) id: UserByIdDTO,
-  ): Promise<void> {
-    return await this.usersService.delete(id);
+  async delete(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {
+    return this.usersService.delete(id);
   }
 }

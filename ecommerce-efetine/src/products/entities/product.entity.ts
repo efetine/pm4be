@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { v4 as UUID } from 'uuid';
 
-import { Category } from './category.entity';
+import { Category } from '../../categories/entities/category.entity';
 
 @Entity({ name: 'products' })
 export class Product {
@@ -47,10 +47,7 @@ export class Product {
     nullable: false,
   })
   @JoinColumn({ name: 'category_id' })
-  @ApiProperty({
-    type: () => Category,
-    nullable: false,
-  })
+  @ApiProperty()
   category: Category;
 
   // @ManyToOne(() => OrderDetail, (orderDetail) => orderDetail.product)

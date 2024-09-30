@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Order } from '../entities/order.entity';
-import { User } from '../entities/user.entity';
+
 import { OrderDetailsService } from '../order-details/order-details.service';
+import { User } from '../users/entities/user.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { Order } from './entities/order.entity';
 import { OrdersRepository } from './orders.repository';
 
 @Injectable()
@@ -19,12 +20,7 @@ export class OrdersService {
     const orderDetails = await this.ordersDetailsService.create(order);
 
     // Creamos la orden
-    return await this.orderRepository.create({
-      details: orderDetails,
-      user: {
-        id: userId,
-      },
-    });
+    return await this.orderRepository.create(orderDetails, userId);
   }
 
   async findOne(id: Order['id']) {

@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 
-import { Product } from '../entities/product.entity';
+import { Product } from '../products/entities/product.entity';
 import { ProductsService } from '../products/products.service';
 import { FilesRepository } from './files.repository';
 

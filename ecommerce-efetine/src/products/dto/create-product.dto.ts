@@ -20,6 +20,7 @@ export class CreateProductDto {
   @ApiProperty({
     minimum: 3,
     maximum: 50,
+    example: 'Mouse',
   })
   name: string;
 
@@ -31,6 +32,7 @@ export class CreateProductDto {
   @ApiProperty({
     minimum: 10,
     maximum: 255,
+    example: 'Gamer Mouse',
   })
   description: string;
 
@@ -57,6 +59,15 @@ export class CreateProductDto {
   @IsNotEmpty()
   @IsString()
   @IsUrl()
-  @ApiProperty()
+  @ApiProperty({
+    example: 'https://picsum.photos/seed/JrrxJLN4/640/480',
+  })
   imgUrl: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @ApiProperty({
+    example: '6431e1fb-2a73-47b8-9db8-7bd7edade8d5',
+  })
+  categoryId: string;
 }

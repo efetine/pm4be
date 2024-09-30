@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { v4 as UUID } from 'uuid';
 
-import { Order } from './order.entity';
+import { Order } from '../../orders/entities/order.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -43,8 +43,6 @@ export class User {
   admin: boolean;
 
   @OneToMany(() => Order, (order) => order.user)
-  @ApiProperty({
-    type: () => [Order],
-  })
+  @ApiProperty()
   orders: Order[];
 }

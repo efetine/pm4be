@@ -20,18 +20,17 @@ import {
   ApiOperation,
   ApiParam,
   ApiTags,
-  getSchemaPath,
 } from '@nestjs/swagger';
+
 import { PaginationsDTO } from '../dto/pagination.dto';
-import { Product } from '../entities/product.entity';
+import { Product } from '../products/entities/product.entity';
 import { Public } from '../utils/public.decorator';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { IProduct } from './interfaces/products.interfaces';
 import { ProductsService } from './products.service';
 
-@Controller('/products')
 @ApiTags('Products')
+@Controller('/products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
@@ -41,12 +40,9 @@ export class ProductsController {
   @ApiOperation({ summary: 'Create a product' })
   @ApiCreatedResponse({
     description: 'Product created',
-    schema: {
-      $ref: getSchemaPath(Product),
-    },
   })
   @ApiInternalServerErrorResponse()
-  async create(@Body() body: CreateProductDto): Promise<IProduct> {
+  async create(@Body() body: CreateProductDto): Promise<Product> {
     return await this.productsService.create(body);
   }
 
@@ -58,13 +54,10 @@ export class ProductsController {
     description: 'An array of products',
     schema: {
       type: 'array',
-      items: {
-        $ref: getSchemaPath(Product),
-      },
     },
   })
   @ApiInternalServerErrorResponse()
-  async findAll(@Query() query: PaginationsDTO): Promise<IProduct[]> {
+  async findAll(@Query() query: PaginationsDTO): Promise<Product[]> {
     const { page = 0, limit = 5 } = query;
 
     return await this.productsService.findAll({ page, limit });
@@ -76,9 +69,6 @@ export class ProductsController {
   @ApiOperation({ summary: 'Get a product' })
   @ApiOkResponse({
     description: 'A specific product',
-    schema: {
-      $ref: getSchemaPath(Product),
-    },
   })
   @ApiNotFoundResponse({
     description: 'Product not found',
@@ -92,8 +82,8 @@ export class ProductsController {
     },
   })
   async findOne(
-    @Param('id', new ParseUUIDPipe()) id: IProduct['id'],
-  ): Promise<IProduct> {
+    @Param('id', new ParseUUIDPipe()) id: Product['id'],
+  ): Promise<Product> {
     return await this.productsService.findOne(id);
   }
 
@@ -103,9 +93,6 @@ export class ProductsController {
   @ApiOperation({ summary: 'Update a product' })
   @ApiOkResponse({
     description: 'Product updated',
-    schema: {
-      $ref: getSchemaPath(Product),
-    },
   })
   @ApiNotFoundResponse({
     description: 'Product not found',
@@ -119,10 +106,10 @@ export class ProductsController {
     },
   })
   async update(
-    @Param('id', new ParseUUIDPipe()) id: IProduct['id'],
+    @Param('id', new ParseUUIDPipe()) id: Product['id'],
     @Body() body: UpdateProductDto,
-  ): Promise<IProduct> {
-    return await this.productsService.update(id, body);
+  ): Promise<void> {
+    return this.productsService.update(id, body);
   }
 
   @HttpCode(200)
@@ -144,7 +131,7 @@ export class ProductsController {
     },
   })
   async delete(
-    @Param('id', new ParseUUIDPipe()) id: IProduct['id'],
+    @Param('id', new ParseUUIDPipe()) id: Product['id'],
   ): Promise<void> {
     try {
       return this.productsService.delete(id);

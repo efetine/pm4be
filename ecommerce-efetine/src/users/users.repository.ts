@@ -9,10 +9,9 @@ import { compare } from 'bcrypt';
 import { Repository } from 'typeorm';
 
 import { LoginAuthDto } from '../auth/dto/login-auth.dto';
-import { User } from '../entities/user.entity';
+import { User } from '../users/entities/user.entity';
 import { UserOutput } from './dto/create-user-output';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UserByIdDTO } from './dto/id-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 @Injectable()
 export class UsersRepository {
@@ -48,10 +47,10 @@ export class UsersRepository {
       throw new BadRequestException();
     }
   }
-  async findOne({ id }: UserByIdDTO): Promise<UserOutput> {
+  async findOne(userId: string): Promise<UserOutput> {
     const user = await this.usersRepository.findOne({
       where: {
-        id: id,
+        id: userId,
       },
       select: {
         id: true,
@@ -90,9 +89,9 @@ export class UsersRepository {
     return rest;
   }
 
-  async delete({ id }: UserByIdDTO): Promise<void> {
+  async delete(userId: string): Promise<void> {
     const user = await this.usersRepository.delete({
-      id: id,
+      id: userId,
     });
 
     if (user.affected === 0) throw new NotFoundException();
@@ -100,16 +99,16 @@ export class UsersRepository {
     return;
   }
 
-  async update(body: UpdateUserDto, { id }: UserByIdDTO): Promise<UserOutput> {
+  async update(body: UpdateUserDto, userId: string): Promise<void> {
     const user = await this.usersRepository.update(
       {
-        id: id,
+        id: userId,
       },
       body,
     );
 
     if (user.affected === 0) throw new NotFoundException();
 
-    return user.raw;
+    return;
   }
 }

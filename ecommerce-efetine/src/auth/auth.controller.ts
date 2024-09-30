@@ -20,6 +20,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
+  @HttpCode(200)
   @Post('/login') //sign in
   @ApiOperation({ summary: 'Login a user' })
   @ApiOkResponse({

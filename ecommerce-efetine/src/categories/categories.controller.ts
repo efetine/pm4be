@@ -20,11 +20,11 @@ import {
   ApiOperation,
   ApiParam,
   ApiTags,
-  getSchemaPath,
 } from '@nestjs/swagger';
-import { Category } from '../entities/category.entity';
+
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { Category } from './entities/category.entity';
 
 @Controller('categories')
 @ApiTags('Categories')
@@ -50,9 +50,6 @@ export class CategoriesController {
     description: 'An array of categories',
     schema: {
       type: 'array',
-      items: {
-        $ref: getSchemaPath(Category),
-      },
     },
   })
   @ApiInternalServerErrorResponse()
@@ -65,9 +62,6 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Get a category' })
   @ApiOkResponse({
     description: 'A category object',
-    schema: {
-      $ref: getSchemaPath(Category),
-    },
   })
   @ApiNotFoundResponse({
     description: 'Category not found',
@@ -94,9 +88,6 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Update a category' })
   @ApiOkResponse({
     description: 'Updated category object',
-    schema: {
-      $ref: getSchemaPath(Category),
-    },
   })
   @ApiNotFoundResponse({
     description: 'Category not found',

@@ -1,8 +1,8 @@
 import { DataSource } from 'typeorm';
 import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 
-import { Category } from '../../entities/category.entity';
-import { Product } from '../../entities/product.entity';
+import { Category } from '../../categories/entities/category.entity';
+import { Product } from '../../products/entities/product.entity';
 
 export default class ProductsSeeder implements Seeder {
   public async run(

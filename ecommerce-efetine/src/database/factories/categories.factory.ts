@@ -1,5 +1,5 @@
 import { setSeederFactory } from 'typeorm-extension';
-import { Category } from '../../entities/category.entity';
+import { Category } from '../../categories/entities/category.entity';
 
 export default setSeederFactory(Category, (faker) => {
   const category = new Category();

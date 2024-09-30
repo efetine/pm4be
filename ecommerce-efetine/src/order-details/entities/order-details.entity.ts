@@ -8,8 +8,8 @@ import {
 } from 'typeorm';
 import { v4 as UUID } from 'uuid';
 
-import { Order } from './order.entity';
-import { Product } from './product.entity';
+import { Order } from '../../orders/entities/order.entity';
+import { Product } from '../../products/entities/product.entity';
 
 @Entity({ name: 'orderDetails' })
 export class OrderDetail {
@@ -29,19 +29,13 @@ export class OrderDetail {
     nullable: false,
   })
   @JoinColumn({ name: 'order_id' })
-  @ApiProperty({
-    type: () => Order,
-    nullable: false,
-  })
+  @ApiProperty()
   order: Order;
 
   @ManyToOne(() => Product, {
     nullable: false,
   })
   @JoinColumn({ name: 'product_id' })
-  @ApiProperty({
-    type: Product,
-    nullable: false,
-  })
+  @ApiProperty()
   product: Product;
 }

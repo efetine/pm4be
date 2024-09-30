@@ -15,21 +15,22 @@ import {
   ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
+  ApiInternalServerErrorResponse,
   ApiParam,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { Product } from '../entities/product.entity';
+import { Product } from '../products/entities/product.entity';
 import { FilesService } from './files.service';
 
-@Controller('files')
+@ApiBearerAuth()
 @ApiTags('Files')
+@Controller('files')
 export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Post('/uploadImage/:productId')
   @UseInterceptors(FileInterceptor('file'))
-  @ApiBearerAuth()
   @ApiParam({
     name: 'productId',
     schema: {
@@ -55,6 +56,7 @@ export class FilesController {
   @ApiUnauthorizedResponse({
     description: 'User is not authorized',
   })
+  @ApiInternalServerErrorResponse()
   uploadImage(
     @Param('productId', new ParseUUIDPipe()) productId: Product['id'],
     @UploadedFile(

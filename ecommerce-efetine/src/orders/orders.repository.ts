@@ -5,9 +5,11 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { Order } from '../entities/order.entity';
-import { Product } from '../entities/product.entity';
-import { CreateOrderRepoDto } from './dto/create-order-repo.dto';
+
+import { OrderDetail } from '../order-details/entities/order-details.entity';
+import { Product } from '../products/entities/product.entity';
+import { User } from '../users/entities/user.entity';
+import { Order } from './entities/order.entity';
 
 @Injectable()
 export class OrdersRepository {
@@ -17,11 +19,12 @@ export class OrdersRepository {
     private dataSource: DataSource,
   ) {}
   async create(
-    inputOrder: CreateOrderRepoDto,
+    details: OrderDetail[],
+    userId: User['id'],
   ): Promise<{ order: Order; total: number }> {
     let error = null;
     let total = 0;
-    let order: Order | null = null;
+    let newOrder: Order | null = null;
 
     // el queryRunner se utiliza para ejecutar consultas y transacciones. control remoto que controlas
     const queryRunner = this.dataSource.createQueryRunner();
@@ -29,7 +32,7 @@ export class OrdersRepository {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     try {
-      const productsIds = inputOrder.details.map((detail) => {
+      const productsIds = details.map((detail) => {
         return {
           id: detail.product.id,
         };
@@ -44,7 +47,7 @@ export class OrdersRepository {
         },
       });
 
-      inputOrder.details.forEach((detail) => {
+      details.forEach((detail) => {
         const product = products.find(
           (product) => product.id === detail.product.id,
         );
@@ -67,26 +70,32 @@ export class OrdersRepository {
       });
 
       // Creamos la orden
-      const orderEntity = this.ordersRepository.create(inputOrder);
-      order = await queryRunner.manager.save(orderEntity);
+      const orderEntity = this.ordersRepository.create({
+        details,
+        user: {
+          id: userId,
+        },
+      });
+      const savedOrder = await queryRunner.manager.save(orderEntity);
 
       // Asignamos la orden a cada detalle de orden // devuelve algo nuevo.. no es destructivo
       // Este método crea una nueva lista de detalles a partir de la lista original, aplicando una función a cada elemento.
-      const details = inputOrder.details.map((detail) => {
-        if (order !== null) {
-          detail.order = order;
+      const mappedDetails = details.map((detail) => {
+        if (savedOrder !== null) {
+          detail.order = savedOrder;
         }
 
         return detail;
       });
 
       // Guardamos el detalle de orden
-      await queryRunner.manager.save(details);
+      await queryRunner.manager.save(mappedDetails);
 
       // Ejecutamos la transaccion
       await queryRunner.commitTransaction();
 
-      total = this.getTotal(order);
+      total = this.getTotal(savedOrder);
+      newOrder = savedOrder;
     } catch (err) {
       error = err;
       // since we have errors lets rollback the changes we made
@@ -101,11 +110,11 @@ export class OrdersRepository {
       throw error;
     }
 
-    if (order === null) {
+    if (newOrder === null) {
       throw new InternalServerErrorException();
     }
 
-    return { order, total };
+    return { order: newOrder, total };
   }
 
   async findOne(id: Order['id']) {

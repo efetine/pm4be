@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { PaginationsDTO } from '../dto/pagination.dto';
-import { Product } from '../entities/product.entity';
+import { Product } from '../products/entities/product.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { IProduct } from './interfaces/products.interfaces';
 
 @Injectable()
 export class productsRepository {
@@ -14,7 +14,7 @@ export class productsRepository {
     private productsRepository: Repository<Product>,
   ) {}
 
-  async findAll({ limit = 5, page = 0 }: PaginationsDTO): Promise<IProduct[]> {
+  async findAll({ limit = 5, page = 0 }: PaginationsDTO): Promise<Product[]> {
     const products = await this.productsRepository.find({
       relations: {
         category: true,
@@ -25,13 +25,19 @@ export class productsRepository {
     return products;
   }
 
-  async create(body: CreateProductDto): Promise<IProduct> {
-    const product = this.productsRepository.create(body);
+  async create(body: CreateProductDto): Promise<Product> {
+    const { categoryId, ...rest } = body;
+    const product = this.productsRepository.create({
+      ...rest,
+      category: {
+        id: categoryId,
+      },
+    });
     const newProduct = await this.productsRepository.save(product);
     return newProduct;
   }
 
-  async findOne(id: IProduct['id']): Promise<IProduct> {
+  async findOne(id: Product['id']): Promise<Product> {
     const product = await this.productsRepository.findOne({
       where: {
         id: id,
@@ -43,7 +49,7 @@ export class productsRepository {
     return product;
   }
 
-  async delete(id: IProduct['id']): Promise<void> {
+  async delete(id: Product['id']): Promise<void> {
     const product = await this.productsRepository.delete({
       id: id,
     });
@@ -53,7 +59,7 @@ export class productsRepository {
     return;
   }
 
-  async update(id: IProduct['id'], body: UpdateProductDto): Promise<IProduct> {
+  async update(id: Product['id'], body: UpdateProductDto): Promise<void> {
     const product = await this.productsRepository.update(
       {
         id: id,
@@ -62,6 +68,6 @@ export class productsRepository {
     );
     if (product.affected === 0) throw new NotFoundException();
 
-    return product.raw;
+    return;
   }
 }
