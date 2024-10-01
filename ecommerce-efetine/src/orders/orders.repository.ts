@@ -26,7 +26,6 @@ export class OrdersRepository {
     let total = 0;
     let newOrder: Order | null = null;
 
-    // el queryRunner se utiliza para ejecutar consultas y transacciones. control remoto que controlas
     const queryRunner = this.dataSource.createQueryRunner();
 
     await queryRunner.connect();
@@ -38,7 +37,6 @@ export class OrdersRepository {
         };
       });
 
-      // Buscamos el stock de los productos
       const products = await queryRunner.manager.find(Product, {
         where: productsIds,
         select: {
@@ -56,20 +54,17 @@ export class OrdersRepository {
           throw new NotFoundException();
         }
 
-        // Validamos que cada producto tenga suficiente stock
         if (product.stock < detail.quantity) {
           throw new InternalServerErrorException(
             `Product with id ${product.id} doesn't have enought stock`,
           );
         }
 
-        // Descontamos la cantidad de cada detalle en cada producto
         queryRunner.manager.update(Product, product.id, {
           stock: product.stock - detail.quantity,
         });
       });
 
-      // Creamos la orden
       const orderEntity = this.ordersRepository.create({
         details,
         user: {
@@ -78,8 +73,6 @@ export class OrdersRepository {
       });
       const savedOrder = await queryRunner.manager.save(orderEntity);
 
-      // Asignamos la orden a cada detalle de orden // devuelve algo nuevo.. no es destructivo
-      // Este método crea una nueva lista de detalles a partir de la lista original, aplicando una función a cada elemento.
       const mappedDetails = details.map((detail) => {
         if (savedOrder !== null) {
           detail.order = savedOrder;
@@ -88,21 +81,16 @@ export class OrdersRepository {
         return detail;
       });
 
-      // Guardamos el detalle de orden
       await queryRunner.manager.save(mappedDetails);
 
-      // Ejecutamos la transaccion
       await queryRunner.commitTransaction();
 
       total = this.getTotal(savedOrder);
       newOrder = savedOrder;
     } catch (err) {
       error = err;
-      // since we have errors lets rollback the changes we made
       await queryRunner.rollbackTransaction();
     } finally {
-      // you need to release a queryRunner which was manually instantiated
-      // por mas que salga un try o un catch siempre se va ejecutar // Este método libera la conexión con la base de datos.
       await queryRunner.release();
     }
 

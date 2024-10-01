@@ -10,6 +10,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -22,6 +23,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { IsAdminGuard } from '../auth/guard/is-admin.guard';
 import { PaginationsDTO } from '../dto/pagination.dto';
 import { Product } from '../products/entities/product.entity';
 import { Public } from '../utils/public.decorator';
@@ -36,6 +38,7 @@ export class ProductsController {
 
   @HttpCode(201)
   @Post()
+  @UseGuards(IsAdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a product' })
   @ApiCreatedResponse({
@@ -89,6 +92,7 @@ export class ProductsController {
 
   @HttpCode(200)
   @Patch(':id')
+  @UseGuards(IsAdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a product' })
   @ApiOkResponse({
@@ -114,6 +118,7 @@ export class ProductsController {
 
   @HttpCode(200)
   @Delete(':id')
+  @UseGuards(IsAdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a product' })
   @ApiOkResponse({

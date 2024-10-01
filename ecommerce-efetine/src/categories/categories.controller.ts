@@ -9,6 +9,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 
 import {
@@ -22,6 +23,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 
+import { IsAdminGuard } from '../auth/guard/is-admin.guard';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { Category } from './entities/category.entity';
@@ -33,6 +35,7 @@ export class CategoriesController {
 
   @HttpCode(201)
   @Post()
+  @UseGuards(IsAdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a category' })
   @ApiCreatedResponse({
@@ -84,6 +87,7 @@ export class CategoriesController {
   }
 
   @Patch(':id')
+  @UseGuards(IsAdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a category' })
   @ApiOkResponse({
@@ -107,6 +111,7 @@ export class CategoriesController {
   }
 
   @Delete(':id')
+  @UseGuards(IsAdminGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a category' })
   @ApiOkResponse({
